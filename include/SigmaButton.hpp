@@ -34,20 +34,24 @@ private:
     bool clickLevel;
     bool btnStatus = false;
     SigmaButtonEvent btnState = SIGMABUTTON_EVENT_ERROR;
+    ulong lastClick = 0;
 
     int timeSimple = 200;
     int timeLong = 1000;
     int timeLongLong = 3000;
-    int timeDouble = 500;
+    int timeDouble = 300;
 
     TimerHandle_t debounceTimer;
     StaticTimer_t debounceTimerBuffer;
     TimerHandle_t cycleTimer;
     StaticTimer_t cycleTimerBuffer;
+    TimerHandle_t doubleTimer;
+    StaticTimer_t doubleTimerBuffer;
 
     static void processISR(void *arg);
     void process();
     static void debounceFunc(TimerHandle_t xTimer);
     SigmaButtonEvent releaseEvent();
     static void cycleFunc(TimerHandle_t xTimer);
+    static void doubleFunc(TimerHandle_t xTimer);
 };

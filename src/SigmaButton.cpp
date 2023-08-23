@@ -2,15 +2,15 @@
 
 ESP_EVENT_DEFINE_BASE(SIGMABUTTON_EVENT);
 
-SigmaButton::SigmaButton(int pin, bool clickLevel, int debounceTime, bool pullup)
+SigmaButton::SigmaButton(int pin, bool clickLevel, bool pullup)
 {
     pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
     this->pin = pin;
     this->clickLevel = clickLevel;
-    this->debounceTime = debounceTime;
+    this->timeDebounce = timeDebounce;
     btnStatus = digitalRead(pin);
     attachInterruptArg(pin, processISR, this, CHANGE);
-    debounceTimer = xTimerCreateStatic("SB_debounce", pdMS_TO_TICKS(debounceTime), pdFALSE, this, debounceFunc, &debounceTimerBuffer);
+    debounceTimer = xTimerCreateStatic("SB_debounce", pdMS_TO_TICKS(timeDebounce), pdFALSE, this, debounceFunc, &debounceTimerBuffer);
     cycleTimer = xTimerCreateStatic("SB_cycle", pdMS_TO_TICKS(100), pdFALSE, this, cycleFunc, &cycleTimerBuffer);
     doubleTimer = xTimerCreateStatic("SB_double", pdMS_TO_TICKS(timeDouble), pdFALSE, this, doubleFunc, &doubleTimerBuffer);
 }
@@ -20,6 +20,7 @@ SigmaButton::~SigmaButton()
     detachInterrupt(pin);
     xTimerDelete(debounceTimer, 0);
     xTimerDelete(cycleTimer, 0);
+    xTimerDelete(doubleTimer, 0);
 }
 
 IRAM_ATTR void SigmaButton::processISR(void *arg)

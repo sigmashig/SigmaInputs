@@ -23,19 +23,28 @@ typedef enum
 class SigmaButton
 {
 public:
-    SigmaButton(int pin, bool clickLevel = LOW, int debounceTime = 50, bool pullup = false);
+    SigmaButton(int pin, bool clickLevel = LOW, bool pullup = false);
     ~SigmaButton();
-    void Begin();
+    void SetDebounceTime(int time) { timeDebounce = time; };
+    void SetTimeSimple(int time) { timeSimple = time; };
+    void SetTimeLong(int time) { timeLong = time; };
+    void SetTimeLongLong(int time) { timeLongLong = time; };
+    void SetTimeDouble(int time) { timeDouble = time; };
+    int GetDebounceTime() { return timeDebounce; };
+    int GetTimeSimple() { return timeSimple; };
+    int GetTimeLong() { return timeLong; };
+    int GetTimeLongLong() { return timeLongLong; };
+    int GetTimeDouble() { return timeDouble; };
 
 private:
     bool btnClick = false;
-    int debounceTime;
     int pin;
     bool clickLevel;
     bool btnStatus = false;
     SigmaButtonEvent btnState = SIGMABUTTON_EVENT_ERROR;
     ulong lastClick = 0;
 
+    int timeDebounce = 50;
     int timeSimple = 200;
     int timeLong = 1000;
     int timeLongLong = 3000;

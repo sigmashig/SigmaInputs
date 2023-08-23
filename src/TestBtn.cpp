@@ -58,7 +58,7 @@ void setup()
     esp_event_loop_create_default();
     esp_event_handler_register(SIGMABUTTON_EVENT, ESP_EVENT_ANY_ID, eventHandler, NULL);
     Serial.println("-------- Event handler registered --------");
-    btn = new SigmaButton(16, LOW, 50, false);
+    btn = new SigmaButton(16, LOW, false);
     Serial.println("-------- Button created --------");
 }
 

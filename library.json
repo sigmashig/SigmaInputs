@@ -1,11 +1,11 @@
 {
-    "name": "SigmaButton",
+    "name": "SigmaInputs",
     "version": "0.1.0",
-    "description": "ESP32 Only! This library provides async implementation of button processing",
-    "keywords": "button",
+    "description": "ESP32 Only! This library provides async implementation of input switch devices processing",
+    "keywords": ["button","keypad","membrane"],
     "repository": {
         "type": "git",
-        "url": "https://github.com/sigmashig/SigmaButton.git"
+        "url": "https://github.com/sigmashig/SigmaInputs.git"
     },
     "authors": [
         {

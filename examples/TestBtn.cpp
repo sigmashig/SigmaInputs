@@ -7,42 +7,42 @@ void eventHandler(void *arg, esp_event_base_t event_base, int32_t event_id, void
     byte *btnId = (byte *)event_data;
     switch (event_id)
     {
-    case SIGMABUTTON_EVENT_CLICK:
+    case SIGMA_BUTTON_EVENT_CLICK:
         Serial.printf("Click:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_SIMPLE_CLICK:
+    case SIGMA_BUTTON_EVENT_SIMPLE_CLICK:
         Serial.printf("Simple click:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_DOUBLE_CLICK:
+    case SIGMA_BUTTON_EVENT_DOUBLE_CLICK:
         Serial.printf("Double click:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_LONG_CLICK:
+    case SIGMA_BUTTON_EVENT_LONG_CLICK:
         Serial.printf("Long click:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_LONG_LONG_CLICK:
+    case SIGMA_BUTTON_EVENT_LONG_LONG_CLICK:
         Serial.printf("Long long click:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_RELEASE:
+    case SIGMA_BUTTON_EVENT_RELEASE:
         Serial.printf("Release:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_SIMPLE_RELEASE:
+    case SIGMA_BUTTON_EVENT_SIMPLE_RELEASE:
         Serial.printf("Simple release:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_DOUBLE_RELEASE:
+    case SIGMA_BUTTON_EVENT_DOUBLE_RELEASE:
         Serial.printf("Double release:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_LONG_RELEASE:
+    case SIGMA_BUTTON_EVENT_LONG_RELEASE:
         Serial.printf("Long release:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_LONG_LONG_RELEASE:
+    case SIGMA_BUTTON_EVENT_LONG_LONG_RELEASE:
         Serial.printf("Long long release:%d\n", *btnId);
         break;
-    case SIGMABUTTON_EVENT_DEBOUNCE:
+    case SIGMA_BUTTON_EVENT_DEBOUNCE:
     {
         Serial.printf("Debounce=%d\n", *btnId);
         break;
     }
-    case SIGMABUTTON_EVENT_ERROR:
+    case SIGMA_BUTTON_EVENT_ERROR:
         Serial.printf("Error:%d\n", *btnId);
         break;
     default:
@@ -56,7 +56,7 @@ void setup()
     Serial.begin(115200);
     Serial.println("-------- Hello world! --------");
     esp_event_loop_create_default();
-    esp_event_handler_register(SIGMABUTTON_EVENT, ESP_EVENT_ANY_ID, eventHandler, NULL);
+    esp_event_handler_register(SIGMA_BUTTON_EVENT, ESP_EVENT_ANY_ID, eventHandler, NULL);
     Serial.println("-------- Event handler registered --------");
     btn = new SigmaButton(111, 16, LOW, false);
     Serial.println("-------- Button created --------");

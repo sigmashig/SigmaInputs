@@ -1,6 +1,6 @@
 #include "SigmaButton.hpp"
 
-ESP_EVENT_DEFINE_BASE(SIGMABUTTON_EVENT);
+ESP_EVENT_DEFINE_BASE(SIGMA_BUTTON_EVENT);
 
 SigmaButton::SigmaButton(byte btnId, int pin, bool clickLevel, bool pullup)
 {
@@ -49,8 +49,8 @@ void SigmaButton::process()
 void SigmaButton::doubleFunc(TimerHandle_t xTimer)
 {
     SigmaButton *button = (SigmaButton *)pvTimerGetTimerID(xTimer);
-    button->btnState = SIGMABUTTON_EVENT_RELEASE;
-    esp_event_post(SIGMABUTTON_EVENT, SIGMABUTTON_EVENT_RELEASE, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+    button->btnState = SIGMA_BUTTON_EVENT_RELEASE;
+    esp_event_post(SIGMA_BUTTON_EVENT, SIGMA_BUTTON_EVENT_RELEASE, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
 }
 
 void SigmaButton::debounceFunc(TimerHandle_t xTimer)
@@ -67,14 +67,14 @@ void SigmaButton::debounceFunc(TimerHandle_t xTimer)
             ulong ts = millis();
             if (button->lastClick + button->timeDouble > ts)
             {
-                button->btnState = SIGMABUTTON_EVENT_DOUBLE_CLICK;
-                esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+                button->btnState = SIGMA_BUTTON_EVENT_DOUBLE_CLICK;
+                esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
                 xTimerStop(button->doubleTimer, 0);
             }
             else
             {
-                button->btnState = SIGMABUTTON_EVENT_CLICK;
-                esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+                button->btnState = SIGMA_BUTTON_EVENT_CLICK;
+                esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
                 xTimerChangePeriod(button->cycleTimer, pdMS_TO_TICKS(button->timeSimple), 0);
                 xTimerStart(button->cycleTimer, 0);
             }
@@ -83,38 +83,38 @@ void SigmaButton::debounceFunc(TimerHandle_t xTimer)
         else
         {
             xTimerStop(button->cycleTimer, 0);
-            if (button->btnState == SIGMABUTTON_EVENT_CLICK)
+            if (button->btnState == SIGMA_BUTTON_EVENT_CLICK)
             {
                 xTimerStart(button->doubleTimer, 0);
             }
             else
             {
                 button->btnState = button->releaseEvent();
-                esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+                esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
             }
         }
     }
     else
     {
-        esp_event_post(SIGMABUTTON_EVENT, SIGMABUTTON_EVENT_ERROR, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+        esp_event_post(SIGMA_BUTTON_EVENT, SIGMA_BUTTON_EVENT_ERROR, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
     }
     button->AttachInterruptArg(button->pin, processISR, button, CHANGE);
 }
 
 SigmaButtonEvent SigmaButton::releaseEvent()
 {
-    if (btnState == SIGMABUTTON_EVENT_CLICK)
-        return SIGMABUTTON_EVENT_RELEASE;
-    if (btnState == SIGMABUTTON_EVENT_SIMPLE_CLICK)
-        return SIGMABUTTON_EVENT_SIMPLE_RELEASE;
-    if (btnState == SIGMABUTTON_EVENT_LONG_CLICK)
-        return SIGMABUTTON_EVENT_LONG_RELEASE;
-    if (btnState == SIGMABUTTON_EVENT_LONG_LONG_CLICK)
-        return SIGMABUTTON_EVENT_LONG_LONG_RELEASE;
-    if (btnState == SIGMABUTTON_EVENT_DOUBLE_CLICK)
-        return SIGMABUTTON_EVENT_DOUBLE_RELEASE;
+    if (btnState == SIGMA_BUTTON_EVENT_CLICK)
+        return SIGMA_BUTTON_EVENT_RELEASE;
+    if (btnState == SIGMA_BUTTON_EVENT_SIMPLE_CLICK)
+        return SIGMA_BUTTON_EVENT_SIMPLE_RELEASE;
+    if (btnState == SIGMA_BUTTON_EVENT_LONG_CLICK)
+        return SIGMA_BUTTON_EVENT_LONG_RELEASE;
+    if (btnState == SIGMA_BUTTON_EVENT_LONG_LONG_CLICK)
+        return SIGMA_BUTTON_EVENT_LONG_LONG_RELEASE;
+    if (btnState == SIGMA_BUTTON_EVENT_DOUBLE_CLICK)
+        return SIGMA_BUTTON_EVENT_DOUBLE_RELEASE;
     //    Serial.printf("STATE=%d\n", btnState);
-    return SIGMABUTTON_EVENT_ERROR;
+    return SIGMA_BUTTON_EVENT_ERROR;
 }
 
 void SigmaButton::cycleFunc(TimerHandle_t xTimer)
@@ -125,22 +125,22 @@ void SigmaButton::cycleFunc(TimerHandle_t xTimer)
     //bool btn = digitalRead(button->pin);
     switch (button->btnState)
     {
-    case SIGMABUTTON_EVENT_CLICK:
-        button->btnState = SIGMABUTTON_EVENT_SIMPLE_CLICK;
-        esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+    case SIGMA_BUTTON_EVENT_CLICK:
+        button->btnState = SIGMA_BUTTON_EVENT_SIMPLE_CLICK;
+        esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
 
         xTimerChangePeriod(button->cycleTimer, pdMS_TO_TICKS(button->timeLong), 0);
         xTimerStart(button->cycleTimer, 0);
         break;
-    case SIGMABUTTON_EVENT_SIMPLE_CLICK:
-        button->btnState = SIGMABUTTON_EVENT_LONG_CLICK;
-        esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+    case SIGMA_BUTTON_EVENT_SIMPLE_CLICK:
+        button->btnState = SIGMA_BUTTON_EVENT_LONG_CLICK;
+        esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
         xTimerChangePeriod(button->cycleTimer, pdMS_TO_TICKS(button->timeLongLong), 0);
         xTimerStart(button->cycleTimer, 0);
         break;
-    case SIGMABUTTON_EVENT_LONG_CLICK:
-        button->btnState = SIGMABUTTON_EVENT_LONG_LONG_CLICK;
-        esp_event_post(SIGMABUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
+    case SIGMA_BUTTON_EVENT_LONG_CLICK:
+        button->btnState = SIGMA_BUTTON_EVENT_LONG_LONG_CLICK;
+        esp_event_post(SIGMA_BUTTON_EVENT, button->btnState, &(button->btnId), sizeof(button->btnId), portMAX_DELAY);
         //            xTimerChangePeriod(button->cycleTimer, pdMS_TO_TICKS(button->timeDouble), 0);
         //            xTimerStart(button->cycleTimer, 0);
         break;

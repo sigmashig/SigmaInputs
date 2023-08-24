@@ -36,6 +36,12 @@ public:
     int GetTimeLongLong() { return timeLongLong; };
     int GetTimeDouble() { return timeDouble; };
 
+    virtual void PinMode(uint8_t pin, uint8_t mode){pinMode(pin, mode);};
+    virtual int DigitalRead(uint8_t pin){ return digitalRead(pin);};
+
+    virtual void AttachInterruptArg(uint8_t pin, void (*func)(void *), void *arg, int mode){attachInterruptArg(pin, func, arg, mode);};
+    virtual void DetachInterrupt(uint8_t pin){detachInterrupt(pin);};
+
 private:
     bool btnClick = false;
     int pin;

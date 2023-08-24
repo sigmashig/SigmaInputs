@@ -4,12 +4,12 @@ ESP_EVENT_DEFINE_BASE(SIGMABUTTON_EVENT);
 
 SigmaButton::SigmaButton(int pin, bool clickLevel, bool pullup)
 {
-    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
+    PinMode(pin, pullup ? INPUT_PULLUP : INPUT);
     this->pin = pin;
     this->clickLevel = clickLevel;
     this->timeDebounce = timeDebounce;
-    btnStatus = digitalRead(pin);
-    attachInterruptArg(pin, processISR, this, CHANGE);
+    btnStatus = DigitalRead(pin);
+    AttachInterruptArg(pin, processISR, this, CHANGE);
     debounceTimer = xTimerCreateStatic("SB_debounce", pdMS_TO_TICKS(timeDebounce), pdFALSE, this, debounceFunc, &debounceTimerBuffer);
     cycleTimer = xTimerCreateStatic("SB_cycle", pdMS_TO_TICKS(100), pdFALSE, this, cycleFunc, &cycleTimerBuffer);
     doubleTimer = xTimerCreateStatic("SB_double", pdMS_TO_TICKS(timeDouble), pdFALSE, this, doubleFunc, &doubleTimerBuffer);
@@ -31,8 +31,8 @@ IRAM_ATTR void SigmaButton::processISR(void *arg)
 
 void SigmaButton::process()
 {
-    detachInterrupt(pin);
-    bool btn = digitalRead(pin);
+    DetachInterrupt(pin);
+    bool btn = DigitalRead(pin);
     if (btn != btnStatus)
     {
         btnStatus = btn;
@@ -41,7 +41,7 @@ void SigmaButton::process()
     }
     else
     {
-        attachInterruptArg(pin, processISR, this, CHANGE);
+        AttachInterruptArg(pin, processISR, this, CHANGE);
     }
 }
 
@@ -57,7 +57,7 @@ void SigmaButton::debounceFunc(TimerHandle_t xTimer)
     SigmaButton *button = (SigmaButton *)pvTimerGetTimerID(xTimer);
     ulong ts = millis();
     Serial.printf("[%lu]Debounce: %d:%d\n", ts, button->btnClick, button->btnStatus);
-    bool btn = digitalRead(button->pin);
+    bool btn = button->DigitalRead(button->pin);
     //   Serial.printf("btn: %d\n", btn);
     if (btn == button->btnStatus)
     { // action confirmed
@@ -97,7 +97,7 @@ void SigmaButton::debounceFunc(TimerHandle_t xTimer)
     {
         esp_event_post(SIGMABUTTON_EVENT, SIGMABUTTON_EVENT_ERROR, NULL, 0, portMAX_DELAY);
     }
-    attachInterruptArg(button->pin, processISR, button, CHANGE);
+    button->AttachInterruptArg(button->pin, processISR, button, CHANGE);
 }
 
 SigmaButtonEvent SigmaButton::releaseEvent()
@@ -121,7 +121,7 @@ void SigmaButton::cycleFunc(TimerHandle_t xTimer)
     SigmaButton *button = (SigmaButton *)pvTimerGetTimerID(xTimer);
     //    ulong ts = millis();
     //    Serial.printf("[%lu]Cycle: %d\n", ts, button->btnState);
-    bool btn = digitalRead(button->pin);
+    //bool btn = digitalRead(button->pin);
     switch (button->btnState)
     {
     case SIGMABUTTON_EVENT_CLICK:

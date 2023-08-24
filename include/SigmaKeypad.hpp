@@ -32,7 +32,7 @@ public:
     virtual int DigitalRead(uint pin) { return digitalRead(pin); }
 
 private:
-    //byte keyPadId;
+    byte keyPadId;
     TimerHandle_t loopTimer;
     StaticTimer_t loopTimerBuffer;
     char lastKey = 0; // confirmed key

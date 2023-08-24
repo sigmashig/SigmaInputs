@@ -23,7 +23,7 @@ typedef enum
 class SigmaButton
 {
 public:
-    SigmaButton(int pin, bool clickLevel = LOW, bool pullup = false);
+    SigmaButton(byte btnId, int pin, bool clickLevel = LOW, bool pullup = false);
     ~SigmaButton();
     void SetDebounceTime(int time) { timeDebounce = time; };
     void SetTimeSimple(int time) { timeSimple = time; };
@@ -43,6 +43,7 @@ public:
     virtual void DetachInterrupt(uint8_t pin) { detachInterrupt(pin); };
 
 private:
+    byte btnId;
     bool btnClick = false;
     int pin;
     bool clickLevel;

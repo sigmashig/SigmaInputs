@@ -7,8 +7,8 @@ SigmaKeypad<4, 4> *keypad;
 
 void sigmakeypadEventHandler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
-
-    char c = *((char *)event_data);
+    SigmaKeypadEventData *data = (SigmaKeypadEventData *)event_data;
+    char c = data->key;
 
     switch (event_id)
     {
@@ -25,7 +25,7 @@ void sigmakeypadEventHandler(void *arg, esp_event_base_t event_base, int32_t eve
 void setup()
 {
     Serial.begin(115200);
-    Serial.println("Hello World!");
+    Serial.println("------ Hello World! ------");
 
     uint pinRows[4] = {36, 39, 34, 35};
     uint pinColumns[4] = {26, 14, 12, 15};
@@ -38,7 +38,7 @@ void setup()
     esp_event_loop_create_default();
 
     esp_event_handler_register(SIGMA_KEYPAD_EVENT, ESP_EVENT_ANY_ID, sigmakeypadEventHandler, NULL);
-    keypad = new SigmaKeypad<4, 4>(pinRows, pinColumns, keys);
+    keypad = new SigmaKeypad<4, 4>(123, pinRows, pinColumns, keys);
 }
 
 void loop()

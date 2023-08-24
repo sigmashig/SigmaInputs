@@ -12,12 +12,18 @@ typedef enum
     SIGMA_KEYPAD_EVENT_KEY_RELEASED
 } SigmaKeypadEvent;
 
+typedef struct
+{
+    byte keypadId;
+    char key;
+} SigmaKeypadEventData;
+
 template <int RowNumber, int ColumnNumber>
 class SigmaKeypad
 {
 public:
-    SigmaKeypad(uint pinRows[RowNumber], uint pinColumns[ColumnNumber], const char keys[RowNumber][ColumnNumber]);
-    ~SigmaKeypad(){};
+    SigmaKeypad(byte keypadId, uint pinRows[RowNumber], uint pinColumns[ColumnNumber], const char keys[RowNumber][ColumnNumber]);
+    ~SigmaKeypad();
 
     char GetLastKey() { return lastKey; };
 
@@ -43,8 +49,9 @@ private:
 };
 
 template <int RowNumber, int ColumnNumber>
-inline SigmaKeypad<RowNumber, ColumnNumber>::SigmaKeypad(uint pinRows[RowNumber], uint pinColumns[ColumnNumber], const char keys[RowNumber][ColumnNumber])
+inline SigmaKeypad<RowNumber, ColumnNumber>::SigmaKeypad(byte keypadId, uint pinRows[RowNumber], uint pinColumns[ColumnNumber], const char keys[RowNumber][ColumnNumber])
 {
+    this->keyPadId = keypadId;
     for (int row = 0; row < RowNumber; row++)
     {
         for (int col = 0; col < ColumnNumber; col++)
@@ -76,7 +83,8 @@ inline SigmaKeypad<RowNumber, ColumnNumber>::SigmaKeypad(uint pinRows[RowNumber]
                 keypad->DigitalWrite(keypad->pinColumns[keypad->lastCol], HIGH);
                 if (k != LOW)
                 {
-                    esp_event_post(SIGMA_KEYPAD_EVENT, SIGMA_KEYPAD_EVENT_KEY_RELEASED, &(keypad->lastKey), 1, portMAX_DELAY);
+                    SigmaKeypadEventData eventData = {keypad->keyPadId, keypad->lastKey};
+                    esp_event_post(SIGMA_KEYPAD_EVENT, SIGMA_KEYPAD_EVENT_KEY_RELEASED, &(eventData), sizeof(SigmaKeypadEventData), portMAX_DELAY);
                     keypad->lastKey = 0;
                 }
                 else
@@ -98,7 +106,8 @@ inline SigmaKeypad<RowNumber, ColumnNumber>::SigmaKeypad(uint pinRows[RowNumber]
                         keypad->lastCol = keypad->xCol;
                         keypad->lastRow = keypad->xRow;
                         keypad->xKey = 0;
-                        esp_event_post(SIGMA_KEYPAD_EVENT, SIGMA_KEYPAD_EVENT_KEY_PRESSED, &(keypad->lastKey), 1, portMAX_DELAY);
+                        SigmaKeypadEventData eventData = {keypad->keyPadId, keypad->lastKey};
+                        esp_event_post(SIGMA_KEYPAD_EVENT, SIGMA_KEYPAD_EVENT_KEY_PRESSED, &(eventData), sizeof(SigmaKeypadEventData), portMAX_DELAY);
                     }
                     else
                     {
@@ -132,4 +141,10 @@ inline SigmaKeypad<RowNumber, ColumnNumber>::SigmaKeypad(uint pinRows[RowNumber]
         },
         &loopTimerBuffer);
     xTimerStart(loopTimer, 0);
+}
+
+template <int RowNumber, int ColumnNumber>
+inline SigmaKeypad<RowNumber, ColumnNumber>::~SigmaKeypad()
+{
+    xTimerDelete(loopTimer, 0);
 }

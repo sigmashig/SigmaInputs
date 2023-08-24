@@ -1,0 +1,23 @@
+{
+    "name": "SigmaButton",
+    "version": "0.1.0",
+    "description": "ESP32 Only! This library provides async implementation of button processing",
+    "keywords": "button",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sigmashig/SigmaButton.git"
+    },
+    "authors": [
+        {
+            "name": "Ihor Shevchenko",
+            "email": "igor@ishevchenko.net",
+            "url": "https://github.com/sigmashig"
+        }
+    ],
+    "license": "MIT",
+    "dependencies": {
+    },
+    "homepage": "https://github.com/sigmashig",
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+}

@@ -23,6 +23,7 @@ typedef struct
 {
     String name;
     RcTypes type;
+    
     union
     {
         RC_PS2_Config ps2;
@@ -37,7 +38,7 @@ typedef union
         int jLeftH;
         int jRigthV;
         int jRigthH;
-        int16_t buttons;
+        u16_t buttons;
     } ps2;
 } RcState;
 
@@ -54,6 +55,7 @@ public:
     esp_event_loop_handle_t GetEventLoop() const { return event_loop_handle; }
     esp_event_base_t GetEventBase() const { return event_base; }
     static RcTypes GetRcType(String name);
+    static SigmaRemoteControl *Create(RcConfig rcConfig);
 
 protected:
     void sendState(RcState state);

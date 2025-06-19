@@ -1,4 +1,5 @@
 #include "SigmaRemoteControl.h"
+#include "SigmaPS2.h"
 
 SigmaRemoteControl::SigmaRemoteControl(String name, esp_event_loop_handle_t loop_handle, esp_event_base_t event_base)
 {
@@ -13,6 +14,7 @@ SigmaRemoteControl::SigmaRemoteControl(String name, esp_event_loop_handle_t loop
             .task_stack_size = 4096,
             .task_core_id = 0};
         esp_event_loop_create(&loop_args, (void **)&event_loop_handle);
+        Serial.printf("Event loop created: %s\n", name.c_str());
     }
     else
     {
@@ -44,6 +46,18 @@ RcTypes SigmaRemoteControl::GetRcType(String name)
 void SigmaRemoteControl::sendError(String error)
 {
     esp_event_post_to(event_loop_handle, event_base, SIGMA_RC_ERROR_EVENT, (void *)error.c_str(), error.length()+1, portMAX_DELAY);
+}
+
+SigmaRemoteControl *SigmaRemoteControl::Create(RcConfig rcConfig)
+{
+    switch (rcConfig.type)
+    {
+        case SIGMA_RC_PS2:
+            return new SigmaPS2(rcConfig.name, rcConfig.params.ps2);
+        default:
+            return nullptr;
+    }
+    return nullptr;
 }
 
 void SigmaRemoteControl::sendState(RcState state)

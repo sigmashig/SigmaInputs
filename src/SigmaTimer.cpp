@@ -18,6 +18,7 @@ void SigmaTimer::init()
             .task_core_id = 0};
 
         esp_event_loop_create(&loop_args, (void **)&eventLoop);
+        Serial.printf("Event loop created: %s\n", "SigmaTimer");
         timers.clear();
     }
 }
@@ -32,6 +33,7 @@ void SigmaTimer::CreateTimer(unsigned long time)
         TimerHandle_t xTimer = xTimerCreate(timerName.c_str(), time / portTICK_PERIOD_MS, pdTRUE, (void *)t, timerCallback);
         timers.insert(std::make_pair(time, xTimer));
         xTimerStart(xTimer, 0);
+        Serial.printf("Timer created: %s:%d\n", timerName.c_str(), time);
     }
     else
     { // Nothing to do - timer already exists
@@ -61,6 +63,7 @@ void SigmaTimer::timerCallback(TimerHandle_t xTimer)
 {
     unsigned long timerCnt = (unsigned long)pvTimerGetTimerID(xTimer);
     unsigned long period = xTimerGetPeriod(xTimer);
+    //Serial.printf("Timer[%d] callback: %d\n", period, timerCnt);
     esp_event_post_to(eventLoop, eventBase, timerCnt, (void *)&period, sizeof(period), portMAX_DELAY);
     timerCnt++;
     vTimerSetTimerID(xTimer, (void *)timerCnt);

@@ -63,14 +63,26 @@ typedef struct
 */
 class SigmaPS2 : public SigmaRemoteControl
 {
+    /* Green: ACK
+     * Blue: Clock
+     * Yellow: Att
+     * Red: Power
+     * Black: GND
+     * Grey: 7-9V for vibro
+     * Orange: CMD
+     * Brown: Data
+     * Data and ACK should be pulled-Up to power with 1-1kOhm
+     */
 public:
     SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t loop_handle = nullptr, esp_event_base_t base = nullptr);
     ~SigmaPS2();
+    void readData();
 
 private:
     RC_PS2_Config ps2Config;
-    const int delay = 10;
+    const int delayStand = 10;
     const uint period = 100;
+    RcState lastData = {0};
     /**
      * @brief Read the state of all joysticks and buttons from the controller
      *
@@ -88,4 +100,5 @@ private:
     void sendCommand(byte command, byte &response);
     void setupPins();
     static void readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+    static void timerCallback(TimerHandle_t xTimer);
 };

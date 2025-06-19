@@ -9,11 +9,10 @@ void eventHandler(void *arg, esp_event_base_t event_base, int32_t event_id, void
     if (event_id == SIGMA_RC_DATA_EVENT)
     {
         RcState *psxdata = (RcState *)event_data;
-        Serial.printf("Event: %d\n", event_id);
-        Serial.printf("Buttons: %d\n", psxdata->ps2.buttons);
-        Serial.printf("Left X: %d\n", psxdata->ps2.jLeftH);
-        Serial.printf("Left Y: %d\n", psxdata->ps2.jLeftV);
-        Serial.printf("Right X: %d\n", psxdata->ps2.jRigthH);
+        Serial.printf("Buttons: %d|", psxdata->ps2.buttons);
+        Serial.printf("Left X: %d|", psxdata->ps2.jLeftH);
+        Serial.printf("Left Y: %d|", psxdata->ps2.jLeftV);
+        Serial.printf("Right X: %d|", psxdata->ps2.jRigthH);
         Serial.printf("Right Y: %d\n", psxdata->ps2.jRigthV);
     }
     else if (event_id == SIGMA_RC_ERROR_EVENT)
@@ -44,5 +43,11 @@ void setup()
 
 void loop()
 {
-    vTaskDelete(NULL);
+    /*
+    //vTaskDelete(NULL);
+    Serial.printf("Loop\n");
+    ps2->readData();
+    delay(1000);
+    Serial.printf("Loop end\n");
+    */
 }

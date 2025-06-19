@@ -2,32 +2,54 @@
 #include "SigmaTimer.h"
 
 SigmaPS2::SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t loop_handle, esp_event_base_t base)
-  : SigmaRemoteControl(name, loop_handle, base)
+    : SigmaRemoteControl(name, loop_handle, base)
 {
     this->ps2Config = rcConfig;
     setupPins();
-    SigmaTimer::CreateTimer(period);
-    esp_event_handler_register_with(SigmaTimer::GetEventLoop(), SigmaTimer::GetEventBase(), period, readLoop, this);
+    config(PSXMODE_ANALOG);
+    // config(PSXMODE_ANALOG);
+    // config(PSXMODE_ANALOG);
+    //  config(PSXMODE_DIGITAL);
+
+    TimerHandle_t xTimer = xTimerCreate("SigmaPS2", pdMS_TO_TICKS(period), pdTRUE, (void *)this, timerCallback);
+    xTimerStart(xTimer, 0);
 }
 
 SigmaPS2::~SigmaPS2()
 {
-
 }
 
-void SigmaPS2::readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+void SigmaPS2::readData()
 {
-    SigmaPS2 *ps2 = (SigmaPS2 *)arg;
     RcState psxData;
-    if (ps2->read(psxData) == PSXERROR_SUCCESS)
+    if (read(psxData) == PSXERROR_SUCCESS)
     {
-        ps2->sendState(psxData);
+        if (psxData.ps2.buttons != lastData.ps2.buttons ||
+            psxData.ps2.jLeftH != lastData.ps2.jLeftH ||
+            psxData.ps2.jLeftV != lastData.ps2.jLeftV ||
+            psxData.ps2.jRigthH != lastData.ps2.jRigthH ||
+            psxData.ps2.jRigthV != lastData.ps2.jRigthV)
+        {
+            lastData = psxData;
+            sendState(psxData);
+        }
     }
     else
     {
-        ps2->sendError("PS2 joystick is not connected");
+        sendError("PS2 joystick is not connected");
     }
-}   
+}
+void SigmaPS2::readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+{
+    SigmaPS2 *ps2 = (SigmaPS2 *)arg;
+    ps2->readData();
+}
+
+void SigmaPS2::timerCallback(TimerHandle_t xTimer)
+{
+    SigmaPS2 *ps2 = (SigmaPS2 *)pvTimerGetTimerID(xTimer);
+    ps2->readData();
+}
 
 void SigmaPS2::sendCommand(byte command, byte &response)
 {
@@ -38,14 +60,30 @@ void SigmaPS2::sendCommand(byte command, byte &response)
     for (int i = 0; i < 8; i++)
     {
         // Write command bit
-        SigmaIO::DigitalWrite(ps2Config.pinCmd, (command & (1 << i)) ? HIGH : LOW);
-        SigmaIO::DigitalWrite(ps2Config.pinClock, LOW);
-        delayMicroseconds(delay);
+
+        IOError err;
+        err = SigmaIO::DigitalWrite(ps2Config.pinCmd, (command & (1 << i)) ? HIGH : LOW);
+        if (err != SIGMAIO_SUCCESS)
+        {
+            Serial.printf("Error writing to pin %d: %d\n", ps2Config.pinCmd, err);
+        }
+        err = SigmaIO::DigitalWrite(ps2Config.pinClock, LOW);
+        if (err != SIGMAIO_SUCCESS)
+        {
+            Serial.printf("Error writing to pin %d: %d\n", ps2Config.pinClock, err);
+        }
+        delayMicroseconds(delayStand);
         // Read response bit
         if (SigmaIO::DigitalRead(ps2Config.pinData))
+        {
             response |= 1 << i;
-        SigmaIO::DigitalWrite(ps2Config.pinClock, HIGH);
-        delayMicroseconds(delay);
+        }
+        err = SigmaIO::DigitalWrite(ps2Config.pinClock, HIGH);
+        if (err != SIGMAIO_SUCCESS)
+        {
+            Serial.printf("Error writing to pin %d: %d\n", ps2Config.pinClock, err);
+        }
+        delayMicroseconds(delayStand);
     }
 }
 
@@ -53,23 +91,18 @@ void SigmaPS2::setupPins()
 {
     // Assign pins
     // Setup pins and pin states
-    Serial.printf("Set %d\n", ps2Config.pinData);
     SigmaIO::PinMode(ps2Config.pinData, INPUT_PULLUP);
-    //SigmaIO::DigitalWrite(ps2Config.pinData, HIGH);
+    // SigmaIO::DigitalWrite(ps2Config.pinData, HIGH);
 
-    Serial.printf("Set %d\n", ps2Config.pinCmd);
     SigmaIO::PinMode(ps2Config.pinCmd, OUTPUT);
     SigmaIO::DigitalWrite(ps2Config.pinCmd, HIGH);
 
-    Serial.printf("Set %d\n", ps2Config.pinAtt);
     SigmaIO::PinMode(ps2Config.pinAtt, OUTPUT);
     SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
 
-    Serial.printf("Set %d\n", ps2Config.pinClock);
     SigmaIO::PinMode(ps2Config.pinClock, OUTPUT);
     SigmaIO::DigitalWrite(ps2Config.pinClock, HIGH);
 
-    Serial.printf("Set %d\n", ps2Config.pinAck);
     SigmaIO::PinMode(ps2Config.pinAck, OUTPUT);
     SigmaIO::DigitalWrite(ps2Config.pinAck, HIGH);
 }
@@ -91,14 +124,15 @@ int SigmaPS2::read(RcState &psxdata)
             sendCommand(PSXPROT_IDLE, data[i]);
         SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
         psxdata.ps2.buttons = ~(data[1] + (data[0] << 8));
-        psxdata.ps2.jRigthV = stickToDirection(data[2]);
-        psxdata.ps2.jRigthH = stickToDirection(data[3]);
-        psxdata.ps2.jLeftV = stickToDirection(data[4]);
-        psxdata.ps2.jLeftH = stickToDirection(data[5]);
+        psxdata.ps2.jRigthH = stickToDirection(data[2]);
+        psxdata.ps2.jRigthV = stickToDirection(data[3]);
+        psxdata.ps2.jLeftH = stickToDirection(data[4]);
+        psxdata.ps2.jLeftV = stickToDirection(data[5]);
         return PSXERROR_SUCCESS;
     }
     else
     {
+        //        Serial.printf("No data\n");
         SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
         return PSXERROR_NODATA;
     }
@@ -109,11 +143,11 @@ int SigmaPS2::stickToDirection(byte x)
 
     if (x <= 0x7F)
     {
-        res = -(100 * (0x7F - x)) / 0x7F;
+        res = (100 * (0x7F - x)) / 0x7F;
     }
     else if (x >= 0x81)
     {
-        res = (100 * (x - 0x7F)) / 0x7F;
+        res = -(100 * (x - 0x7F)) / 0x7F;
     }
 
     return res;
@@ -123,45 +157,55 @@ void SigmaPS2::config(byte mode)
 {
     // Perform initial handshake with the controller
     // Enter config
-    byte response;
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
-    sendCommand(PSXPROT_HANDSHAKE, response);
-    sendCommand(PSXPROT_CONFIG, response);
-    sendCommand(PSXPROT_IDLE, response);
-    sendCommand(PSXPROT_ENTERCONFIG, response);
-    sendCommand(PSXPROT_ZERO, response);
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
-    delayMicroseconds(delay);
-    // Set mode
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
-    sendCommand(PSXPROT_HANDSHAKE, response);
-    sendCommand(PSXPROT_CONFIGMODE, response);
-    sendCommand(PSXPROT_IDLE, response);
-    sendCommand(mode, response);
-    sendCommand(PSXPROT_MODELOCK, response);
-    for (int i = 0; i < 4; i++)
-        sendCommand(PSXPROT_ZERO, response);
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
-    delayMicroseconds(delay);
-    // Disable vibration motors
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
-    sendCommand(PSXPROT_HANDSHAKE, response);
-    sendCommand(PSXPROT_CONFIGMOTOR, response);
-    sendCommand(PSXPROT_IDLE, response);
-    sendCommand(PSXPROT_ZERO, response);
-    sendCommand(PSXPROT_MOTORMAP, response);
-    for (int i = 0; i < 4; i++)
-        sendCommand(PSXPROT_NONZERO, response);
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
-    delayMicroseconds(delay);
-    // Finish config
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
-    sendCommand(PSXPROT_HANDSHAKE, response);
-    sendCommand(PSXPROT_CONFIG, response);
-    sendCommand(PSXPROT_IDLE, response);
-    sendCommand(PSXPROT_EXITCONFIG, response);
-    for (int i = 0; i < 5; i++)
-        sendCommand(PSXPROT_EXITCFGCNT, response);
-    SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
-}
+    Serial.printf("Configuring PS2\n");
+    byte response = 0;
+    for (int j = 0; j < 3; j++)
+    { // for unknown reason, the controller needs to be configured several times
 
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
+        sendCommand(PSXPROT_HANDSHAKE, response);
+        sendCommand(PSXPROT_CONFIG, response);
+        sendCommand(PSXPROT_IDLE, response);
+        sendCommand(PSXPROT_ENTERCONFIG, response);
+        sendCommand(PSXPROT_ZERO, response);
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
+        delayMicroseconds(delayStand);
+
+        // Set mode
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
+        sendCommand(PSXPROT_HANDSHAKE, response);
+        sendCommand(PSXPROT_CONFIGMODE, response);
+        sendCommand(PSXPROT_IDLE, response);
+        sendCommand(mode, response);
+        sendCommand(PSXPROT_MODELOCK, response);
+        for (int i = 0; i < 4; i++)
+        {
+            sendCommand(PSXPROT_ZERO, response);
+        }
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
+        delayMicroseconds(delayStand);
+
+        // Disable vibration motors
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
+        sendCommand(PSXPROT_HANDSHAKE, response);
+        sendCommand(PSXPROT_CONFIGMOTOR, response);
+        sendCommand(PSXPROT_IDLE, response);
+        sendCommand(PSXPROT_ZERO, response);
+        sendCommand(PSXPROT_MOTORMAP, response);
+        for (int i = 0; i < 4; i++)
+            sendCommand(PSXPROT_NONZERO, response);
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
+        delayMicroseconds(delayStand);
+
+        // Finish config
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
+        sendCommand(PSXPROT_HANDSHAKE, response);
+        sendCommand(PSXPROT_CONFIG, response);
+        sendCommand(PSXPROT_IDLE, response);
+        sendCommand(PSXPROT_EXITCONFIG, response);
+        for (int i = 0; i < 5; i++)
+            sendCommand(PSXPROT_EXITCFGCNT, response);
+        SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
+        delay(500);
+    }
+}

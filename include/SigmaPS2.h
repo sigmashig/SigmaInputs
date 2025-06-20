@@ -8,8 +8,7 @@
 #include <SigmaRemoteControl.h>
 
 // Button bitfield constants
-
-#define PSXBTN_LEFT 0x8000
+/*
 #define PSXBTN_DOWN 0x4000
 #define PSXBTN_RIGHT 0x2000
 #define PSXBTN_UP 0x1000
@@ -25,6 +24,7 @@
 #define PSXBTN_L1 0x0004
 #define PSXBTN_R2 0x0002
 #define PSXBTN_L2 0x0001
+*/
 
 // Protocol commands and constants
 

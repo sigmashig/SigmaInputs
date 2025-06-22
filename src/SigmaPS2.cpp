@@ -157,7 +157,6 @@ void SigmaPS2::config(byte mode)
 {
     // Perform initial handshake with the controller
     // Enter config
-    Serial.printf("Configuring PS2\n");
     byte response = 0;
     for (int j = 0; j < 3; j++)
     { // for unknown reason, the controller needs to be configured several times

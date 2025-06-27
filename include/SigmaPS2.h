@@ -51,7 +51,7 @@
 #define PSXERROR_NODATA 1
 
 #endif
-/*
+
 typedef struct
 {
     unsigned int buttons; //!< The state of all buttons encoded as a bitfield
@@ -60,7 +60,7 @@ typedef struct
     int JoyRightX;        //!< The horizontal value of the right joystick in persent
     int JoyRightY;        //!< The vertical value of the right joystick in persent
 } PSxData;
-*/
+
 class SigmaPS2 : public SigmaRemoteControl
 {
     /* Green: ACK
@@ -82,14 +82,14 @@ private:
     RC_PS2_Config ps2Config;
     const int delayStand = 10;
     const uint period = 100;
-    RcState lastData = {0};
+    PSxData lastData = {0};
     /**
      * @brief Read the state of all joysticks and buttons from the controller
      *
      * @param psxdata The state read from the controller
      * @return 0 - success, 1 - error
      */
-    int read(RcState &psxdata);
+    int read(PSxData &psxdata);
     int stickToDirection(byte x);
     /**
      * @brief Configures the controller, disables vibration and sets either analog or digital mode
@@ -101,4 +101,5 @@ private:
     void setupPins();
     static void readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
     static void timerCallback(TimerHandle_t xTimer);
+
 };

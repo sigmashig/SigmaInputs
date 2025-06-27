@@ -23,7 +23,7 @@ typedef struct
 {
     String name;
     RcTypes type;
-    
+
     union
     {
         RC_PS2_Config ps2;
@@ -34,13 +34,12 @@ typedef union
 {
     struct
     {
-        int jLeftV;
-        int jLeftH;
-        int jRigthV;
-        int jRigthH;
-        u16_t buttons;
-    } ps2;
+        int vert;
+        int hor;
+    } analogJoystick[4];
+    bool buttons[16];
 } RcState;
+/*
 typedef enum
 {
     BTN_L2 = 0x0001,
@@ -60,8 +59,9 @@ typedef enum
     BTN_DOWN = 0x4000,
     BTN_LEFT = 0x8000
 } RcButton;
-
-typedef enum {
+*/
+typedef enum
+{
     SIGMA_RC_DATA_EVENT,
     SIGMA_RC_ERROR_EVENT,
 } RcEvent;

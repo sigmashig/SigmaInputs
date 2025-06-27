@@ -21,17 +21,27 @@ SigmaPS2::~SigmaPS2()
 
 void SigmaPS2::readData()
 {
-    RcState psxData;
+    PSxData psxData;
+    RcState rcState;
     if (read(psxData) == PSXERROR_SUCCESS)
     {
-        if (psxData.ps2.buttons != lastData.ps2.buttons ||
-            psxData.ps2.jLeftH != lastData.ps2.jLeftH ||
-            psxData.ps2.jLeftV != lastData.ps2.jLeftV ||
-            psxData.ps2.jRigthH != lastData.ps2.jRigthH ||
-            psxData.ps2.jRigthV != lastData.ps2.jRigthV)
+        if (psxData.buttons != lastData.buttons ||
+            psxData.JoyLeftX != lastData.JoyLeftX ||
+            psxData.JoyLeftY != lastData.JoyLeftY ||
+            psxData.JoyRightX != lastData.JoyRightX ||
+            psxData.JoyRightY != lastData.JoyRightY)
         {
             lastData = psxData;
-            sendState(psxData);
+            rcState.analogJoystick[0].hor = psxData.JoyLeftX;
+            rcState.analogJoystick[0].vert = psxData.JoyLeftY;
+            rcState.analogJoystick[1].hor = psxData.JoyRightX;
+            rcState.analogJoystick[1].vert = psxData.JoyRightY;
+            for (int i = 0; i < 16; i++)
+            {
+                int16_t mask = 1 << i;
+                rcState.buttons[i] = (psxData.buttons & mask) != 0;
+            }
+            sendState(rcState);
         }
     }
     else
@@ -107,7 +117,7 @@ void SigmaPS2::setupPins()
     SigmaIO::DigitalWrite(ps2Config.pinAck, HIGH);
 }
 
-int SigmaPS2::read(RcState &psxdata)
+int SigmaPS2::read(PSxData &psxdata)
 {
     // Send data request
     SigmaIO::DigitalWrite(ps2Config.pinAtt, LOW);
@@ -123,11 +133,11 @@ int SigmaPS2::read(RcState &psxdata)
         for (int i = 0; i < 6; i++)
             sendCommand(PSXPROT_IDLE, data[i]);
         SigmaIO::DigitalWrite(ps2Config.pinAtt, HIGH);
-        psxdata.ps2.buttons = ~(data[1] + (data[0] << 8));
-        psxdata.ps2.jRigthH = stickToDirection(data[2]);
-        psxdata.ps2.jRigthV = stickToDirection(data[3]);
-        psxdata.ps2.jLeftH = stickToDirection(data[4]);
-        psxdata.ps2.jLeftV = stickToDirection(data[5]);
+        psxdata.buttons = ~(data[1] + (data[0] << 8));
+        psxdata.JoyRightX = stickToDirection(data[2]);
+        psxdata.JoyRightY = stickToDirection(data[3]);
+        psxdata.JoyLeftX = stickToDirection(data[4]);
+        psxdata.JoyLeftY = stickToDirection(data[5]);
         return PSXERROR_SUCCESS;
     }
     else

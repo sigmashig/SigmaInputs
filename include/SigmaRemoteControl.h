@@ -30,13 +30,13 @@ typedef struct
     } params;
 } RcConfig;
 
-typedef union
+typedef struct
 {
-    struct
+    struct joystick
     {
         int vert;
         int hor;
-    } analogJoystick[4];
+    } analogJoystick[2];
     bool buttons[16];
 } RcState;
 /*

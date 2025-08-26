@@ -9,21 +9,21 @@
 
 // Button bitfield constants
 /*
-#define PSXBTN_DOWN 0x4000
-#define PSXBTN_RIGHT 0x2000
-#define PSXBTN_UP 0x1000
-#define PSXBTN_START 0x0800
-#define PSBTN_ACT_RIGHT 0x0400
-#define PSBTN_ACT_LEFT 0x0200
-#define PSXBTN_SELECT 0x0100
-#define PSXBTN_SQUARE 0x0080
-#define PSXBTN_CROSS 0x0040
-#define PSXBTN_CIRCLE 0x0020
-#define PSXBTN_TRIANGLE 0x0010
-#define PSXBTN_R1 0x0008
-#define PSXBTN_L1 0x0004
-#define PSXBTN_R2 0x0002
 #define PSXBTN_L2 0x0001
+#define PSXBTN_R2 0x0002
+#define PSXBTN_L1 0x0004
+#define PSXBTN_R1 0x0008
+#define PSXBTN_TRIANGLE 0x0010
+#define PSXBTN_CIRCLE 0x0020
+#define PSXBTN_CROSS 0x0040
+#define PSXBTN_SQUARE 0x0080
+#define PSXBTN_SELECT 0x0100
+#define PSBTN_ACT_LEFT 0x0200
+#define PSBTN_ACT_RIGHT 0x0400
+#define PSXBTN_START 0x0800
+#define PSXBTN_UP 0x1000
+#define PSXBTN_RIGHT 0x2000
+#define PSXBTN_DOWN 0x4000
 */
 
 // Protocol commands and constants

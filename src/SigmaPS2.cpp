@@ -7,8 +7,6 @@ SigmaPS2::SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t 
     this->ps2Config = rcConfig;
     setupPins();
     config(PSXMODE_ANALOG);
-    // config(PSXMODE_ANALOG);
-    // config(PSXMODE_ANALOG);
     //  config(PSXMODE_DIGITAL);
 
     TimerHandle_t xTimer = xTimerCreate("SigmaPS2", pdMS_TO_TICKS(period), pdTRUE, (void *)this, timerCallback);
@@ -38,7 +36,7 @@ void SigmaPS2::readData()
             rcState.analogJoystick[1].vert = psxData.JoyRightY;
             for (int i = 0; i < 16; i++)
             {
-                int16_t mask = 1 << i;
+                unsigned int mask = 1 << i;
                 rcState.buttons[i] = (psxData.buttons & mask) != 0;
             }
             sendState(rcState);

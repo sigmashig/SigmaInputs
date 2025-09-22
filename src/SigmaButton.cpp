@@ -1,4 +1,4 @@
-#include "SigmaButton.hpp"
+#include "SigmaButton.h"  
 
 ESP_EVENT_DEFINE_BASE(SIGMA_BUTTON_EVENT);
 

@@ -7,25 +7,6 @@
 #include <SigmaIO.h>
 #include <SigmaRemoteControl.h>
 
-// Button bitfield constants
-/*
-#define PSXBTN_L2 0x0001
-#define PSXBTN_R2 0x0002
-#define PSXBTN_L1 0x0004
-#define PSXBTN_R1 0x0008
-#define PSXBTN_TRIANGLE 0x0010
-#define PSXBTN_CIRCLE 0x0020
-#define PSXBTN_CROSS 0x0040
-#define PSXBTN_SQUARE 0x0080
-#define PSXBTN_SELECT 0x0100
-#define PSBTN_ACT_LEFT 0x0200
-#define PSBTN_ACT_RIGHT 0x0400
-#define PSXBTN_START 0x0800
-#define PSXBTN_UP 0x1000
-#define PSXBTN_RIGHT 0x2000
-#define PSXBTN_DOWN 0x4000
-*/
-
 // Protocol commands and constants
 
 #define PSXPROT_IDLE 0x00
@@ -74,9 +55,36 @@ class SigmaPS2 : public SigmaRemoteControl
      * Data and ACK should be pulled-Up to power with 1-1kOhm
      */
 public:
+    typedef enum
+    {
+        PSXBTN_NONE = 0x0000,
+        PSXBTN_L2 = 0x0001,
+        PSXBTN_R2 = 0x0002,
+        PSXBTN_L1 = 0x0004,
+        PSXBTN_R1 = 0x0008,
+        PSXBTN_TRIANGLE = 0x0010,
+        PSXBTN_CIRCLE = 0x0020,
+        PSXBTN_CROSS = 0x0040,
+        PSXBTN_SQUARE = 0x0080,
+        PSXBTN_SELECT = 0x0100,
+        PSBTN_ACT_LEFT = 0x0200,
+        PSBTN_ACT_RIGHT = 0x0400,
+        PSXBTN_START = 0x0800,
+        PSXBTN_UP = 0x1000,
+        PSXBTN_RIGHT = 0x2000,
+        PSXBTN_DOWN = 0x4000,
+        PSXBTN_LEFT = 0x8000,
+        PSXJOY_LEFTY = 0x10000,
+        PSXJOY_LEFTX = 0x10001,
+        PSXJOY_RIGHTY = 0x10002,
+        PSXJOY_RIGHTX = 0x10003
+    } PSXButton;
+
     SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t loop_handle = nullptr, esp_event_base_t base = nullptr);
     ~SigmaPS2();
     void readData();
+    static PSXButton GetPSXButton(String name);
+    static String PSXButtonToString(uint button);
 
 private:
     RC_PS2_Config ps2Config;
@@ -101,5 +109,4 @@ private:
     void setupPins();
     static void readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
     static void timerCallback(TimerHandle_t xTimer);
-
 };

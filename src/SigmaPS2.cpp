@@ -47,6 +47,59 @@ void SigmaPS2::readData()
         sendError("PS2 joystick is not connected");
     }
 }
+SigmaPS2::PSXButton SigmaPS2::GetPSXButton(String name)
+{
+    String upperName = name;
+    upperName.toUpperCase();
+    if (upperName == "PSXBTN_L2") return PSXBTN_L2;
+    if (upperName == "PSXBTN_R2") return PSXBTN_R2;
+    if (upperName == "PSXBTN_L1") return PSXBTN_L1;
+    if (upperName == "PSXBTN_R1") return PSXBTN_R1;
+    if (upperName == "PSXBTN_TRIANGLE") return PSXBTN_TRIANGLE;
+    if (upperName == "PSXBTN_CIRCLE") return PSXBTN_CIRCLE;
+    if (upperName == "PSXBTN_CROSS") return PSXBTN_CROSS;
+    if (upperName == "PSXBTN_SQUARE") return PSXBTN_SQUARE;
+    if (upperName == "PSXBTN_SELECT") return PSXBTN_SELECT;
+    if (upperName == "PSBTN_ACT_LEFT") return PSBTN_ACT_LEFT;
+    if (upperName == "PSBTN_ACT_RIGHT") return PSBTN_ACT_RIGHT;
+    if (upperName == "PSXBTN_START") return PSXBTN_START;
+    if (upperName == "PSXBTN_UP") return PSXBTN_UP;
+    if (upperName == "PSXBTN_RIGHT") return PSXBTN_RIGHT;
+    if (upperName == "PSXBTN_DOWN") return PSXBTN_DOWN;
+    if (upperName == "PSXBTN_LEFT") return PSXBTN_LEFT;
+    if (upperName == "PSXJOY_LEFTY") return PSXJOY_LEFTY;
+    if (upperName == "PSXJOY_LEFTX") return PSXJOY_LEFTX;
+    if (upperName == "PSXJOY_RIGHTY") return PSXJOY_RIGHTY;
+    if (upperName == "PSXJOY_RIGHTX") return PSXJOY_RIGHTX;
+    return PSXBTN_NONE;
+}
+String SigmaPS2::PSXButtonToString(uint button)
+{
+    switch (button)
+    {
+        case PSXBTN_L2: return "PSXBTN_L2";
+        case PSXBTN_R2: return "PSXBTN_R2";
+        case PSXBTN_L1: return "PSXBTN_L1";
+        case PSXBTN_R1: return "PSXBTN_R1";
+        case PSXBTN_TRIANGLE: return "PSXBTN_TRIANGLE";
+        case PSXBTN_CIRCLE: return "PSXBTN_CIRCLE";
+        case PSXBTN_CROSS: return "PSXBTN_CROSS";
+        case PSXBTN_SQUARE: return "PSXBTN_SQUARE";
+        case PSXBTN_SELECT: return "PSXBTN_SELECT";
+        case PSBTN_ACT_LEFT: return "PSBTN_ACT_LEFT";
+        case PSBTN_ACT_RIGHT: return "PSBTN_ACT_RIGHT";
+        case PSXBTN_START: return "PSXBTN_START";
+        case PSXBTN_UP: return "PSXBTN_UP";
+        case PSXBTN_RIGHT: return "PSXBTN_RIGHT";
+        case PSXBTN_DOWN: return "PSXBTN_DOWN";
+        case PSXBTN_LEFT: return "PSXBTN_LEFT";
+        case PSXJOY_LEFTY: return "PSXJOY_LEFTY";
+        case PSXJOY_LEFTX: return "PSXJOY_LEFTX";
+        case PSXJOY_RIGHTY: return "PSXJOY_RIGHTY";
+        case PSXJOY_RIGHTX: return "PSXJOY_RIGHTX";
+        default: return "PSXBTN_NONE";
+    }
+}
 void SigmaPS2::readLoop(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     SigmaPS2 *ps2 = (SigmaPS2 *)arg;

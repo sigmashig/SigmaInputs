@@ -76,8 +76,16 @@ public:
         PSXBTN_LEFT = 0x8000,
         PSXJOY_LEFTY = 0x10000,
         PSXJOY_LEFTX = 0x10001,
-        PSXJOY_RIGHTY = 0x10002,
-        PSXJOY_RIGHTX = 0x10003
+        PSXJOY_LEFTUP = 0x10002,
+        PSXJOY_LEFTDOWN = 0x10003,
+        PSXJOY_LEFTLEFT = 0x10004,
+        PSXJOY_LEFTRIGHT = 0x10005,
+        PSXJOY_RIGHTY = 0x10006,
+        PSXJOY_RIGHTX = 0x10007,
+        PSXJOY_RIGHTUP = 0x10008,
+        PSXJOY_RIGHTDOWN = 0x10009,
+        PSXJOY_RIGHTLEFT = 0x10010,
+        PSXJOY_RIGHTRIGHT = 0x10011
     } PSXButton;
 
     SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t loop_handle = nullptr, esp_event_base_t base = nullptr);
@@ -85,7 +93,15 @@ public:
     void readData();
     static PSXButton GetPSXButton(String name);
     static String PSXButtonToString(uint button);
-
+    static bool IsLeftJoystick(uint button) { return button == PSXJOY_LEFTY || button == PSXJOY_LEFTX
+                                        || button == PSXJOY_LEFTUP || button == PSXJOY_LEFTDOWN 
+                                        || button == PSXJOY_LEFTLEFT || button == PSXJOY_LEFTRIGHT; }
+    static bool IsRightJoystick(uint button) { return button == PSXJOY_RIGHTY || button == PSXJOY_RIGHTX
+                                        || button == PSXJOY_RIGHTUP || button == PSXJOY_RIGHTDOWN
+                                        || button == PSXJOY_RIGHTLEFT || button == PSXJOY_RIGHTRIGHT; } 
+    static bool IsJoystick(uint button) { return IsLeftJoystick(button) || IsRightJoystick(button); }
+    static bool IsXDirection(uint button) { return button == PSXJOY_LEFTX || button == PSXJOY_RIGHTX; }
+    static bool IsYDirection(uint button) { return button == PSXJOY_LEFTY || button == PSXJOY_RIGHTY; }
 private:
     RC_PS2_Config ps2Config;
     const int delayStand = 10;

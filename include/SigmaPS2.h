@@ -55,37 +55,71 @@ class SigmaPS2 : public SigmaRemoteControl
      * Data and ACK should be pulled-Up to power with 1-1kOhm
      */
 public:
+    /*
+        typedef enum
+        {
+            PSXBTN_NONE = 0x0000,
+            PSXBTN_L2 = 0x0001,
+            PSXBTN_R2 = 0x0002,
+            PSXBTN_L1 = 0x0004,
+            PSXBTN_R1 = 0x0008,
+            PSXBTN_TRIANGLE = 0x0010,
+            PSXBTN_CIRCLE = 0x0020,
+            PSXBTN_CROSS = 0x0040,
+            PSXBTN_SQUARE = 0x0080,
+            PSXBTN_SELECT = 0x0100,
+            PSBTN_ACT_LEFT = 0x0200,
+            PSBTN_ACT_RIGHT = 0x0400,
+            PSXBTN_START = 0x0800,
+            PSXBTN_UP = 0x1000,
+            PSXBTN_RIGHT = 0x2000,
+            PSXBTN_DOWN = 0x4000,
+            PSXBTN_LEFT = 0x8000,
+            PSXJOY_LEFTY = 0x10000,
+            PSXJOY_LEFTX = 0x10001,
+            PSXJOY_LEFTUP = 0x10002,
+            PSXJOY_LEFTDOWN = 0x10003,
+            PSXJOY_LEFTLEFT = 0x10004,
+            PSXJOY_LEFTRIGHT = 0x10005,
+            PSXJOY_RIGHTY = 0x10006,
+            PSXJOY_RIGHTX = 0x10007,
+            PSXJOY_RIGHTUP = 0x10008,
+            PSXJOY_RIGHTDOWN = 0x10009,
+            PSXJOY_RIGHTLEFT = 0x10010,
+            PSXJOY_RIGHTRIGHT = 0x10011
+        } PSXButton;
+    */
     typedef enum
     {
-        PSXBTN_NONE = 0x0000,
-        PSXBTN_L2 = 0x0001,
-        PSXBTN_R2 = 0x0002,
-        PSXBTN_L1 = 0x0004,
-        PSXBTN_R1 = 0x0008,
-        PSXBTN_TRIANGLE = 0x0010,
-        PSXBTN_CIRCLE = 0x0020,
-        PSXBTN_CROSS = 0x0040,
-        PSXBTN_SQUARE = 0x0080,
-        PSXBTN_SELECT = 0x0100,
-        PSBTN_ACT_LEFT = 0x0200,
-        PSBTN_ACT_RIGHT = 0x0400,
-        PSXBTN_START = 0x0800,
-        PSXBTN_UP = 0x1000,
-        PSXBTN_RIGHT = 0x2000,
-        PSXBTN_DOWN = 0x4000,
-        PSXBTN_LEFT = 0x8000,
-        PSXJOY_LEFTY = 0x10000,
-        PSXJOY_LEFTX = 0x10001,
-        PSXJOY_LEFTUP = 0x10002,
-        PSXJOY_LEFTDOWN = 0x10003,
-        PSXJOY_LEFTLEFT = 0x10004,
-        PSXJOY_LEFTRIGHT = 0x10005,
-        PSXJOY_RIGHTY = 0x10006,
-        PSXJOY_RIGHTX = 0x10007,
-        PSXJOY_RIGHTUP = 0x10008,
-        PSXJOY_RIGHTDOWN = 0x10009,
-        PSXJOY_RIGHTLEFT = 0x10010,
-        PSXJOY_RIGHTRIGHT = 0x10011
+        PSXBTN_L2 = 0,          // 0x0001,
+        PSXBTN_R2 = 1,          // 0x0002,
+        PSXBTN_L1 = 2,          // 0x0004,
+        PSXBTN_R1 = 3,          // 0x0008,
+        PSXBTN_TRIANGLE = 4,    // 0x0010,
+        PSXBTN_CIRCLE = 5,      // 0x0020,
+        PSXBTN_CROSS = 6,       // 0x0040,
+        PSXBTN_SQUARE = 7,      // 0x0080,
+        PSXBTN_SELECT = 8,      // 0x0100,
+        PSBTN_ACT_LEFT = 9,     // 0x0200,
+        PSBTN_ACT_RIGHT = 10,   // 0x0400,
+        PSXBTN_START = 11,      // 0x0800,
+        PSXBTN_UP = 12,         // 0x1000,
+        PSXBTN_RIGHT = 13,      // 0x2000,
+        PSXBTN_DOWN = 14,       // 0x4000,
+        PSXBTN_LEFT = 15,       // 0x8000,
+        PSXJOY_LEFTY = 16,      // 0x10000,
+        PSXJOY_LEFTX = 17,      // 0x10001,
+        PSXJOY_LEFTUP = 18,     // 0x10002,
+        PSXJOY_LEFTDOWN = 19,   // 0x10003,
+        PSXJOY_LEFTLEFT = 20,   // 0x10004,
+        PSXJOY_LEFTRIGHT = 21,  // 0x10005,
+        PSXJOY_RIGHTY = 22,     // 0x10006,
+        PSXJOY_RIGHTX = 23,     // 0x10007,
+        PSXJOY_RIGHTUP = 24,    // 0x10008,
+        PSXJOY_RIGHTDOWN = 25,  // 0x10009,
+        PSXJOY_RIGHTLEFT = 26,  // 0x10010,
+        PSXJOY_RIGHTRIGHT = 27, // 0x10011
+        PSXBTN_NONE = 99,       // 0x0000,
     } PSXButton;
 
     SigmaPS2(String name, RC_PS2_Config rcConfig, esp_event_loop_handle_t loop_handle = nullptr, esp_event_base_t base = nullptr);
@@ -93,15 +127,12 @@ public:
     void readData();
     static PSXButton GetPSXButton(String name);
     static String PSXButtonToString(uint button);
-    static bool IsLeftJoystick(uint button) { return button == PSXJOY_LEFTY || button == PSXJOY_LEFTX
-                                        || button == PSXJOY_LEFTUP || button == PSXJOY_LEFTDOWN 
-                                        || button == PSXJOY_LEFTLEFT || button == PSXJOY_LEFTRIGHT; }
-    static bool IsRightJoystick(uint button) { return button == PSXJOY_RIGHTY || button == PSXJOY_RIGHTX
-                                        || button == PSXJOY_RIGHTUP || button == PSXJOY_RIGHTDOWN
-                                        || button == PSXJOY_RIGHTLEFT || button == PSXJOY_RIGHTRIGHT; } 
+    static bool IsLeftJoystick(uint button) { return button == PSXJOY_LEFTY || button == PSXJOY_LEFTX || button == PSXJOY_LEFTUP || button == PSXJOY_LEFTDOWN || button == PSXJOY_LEFTLEFT || button == PSXJOY_LEFTRIGHT; }
+    static bool IsRightJoystick(uint button) { return button == PSXJOY_RIGHTY || button == PSXJOY_RIGHTX || button == PSXJOY_RIGHTUP || button == PSXJOY_RIGHTDOWN || button == PSXJOY_RIGHTLEFT || button == PSXJOY_RIGHTRIGHT; }
     static bool IsJoystick(uint button) { return IsLeftJoystick(button) || IsRightJoystick(button); }
     static bool IsXDirection(uint button) { return button == PSXJOY_LEFTX || button == PSXJOY_RIGHTX; }
     static bool IsYDirection(uint button) { return button == PSXJOY_LEFTY || button == PSXJOY_RIGHTY; }
+
 private:
     RC_PS2_Config ps2Config;
     const int delayStand = 10;

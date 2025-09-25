@@ -57,9 +57,7 @@ void SigmaButton::debounceFunc(TimerHandle_t xTimer)
 {
     SigmaButton *button = (SigmaButton *)pvTimerGetTimerID(xTimer);
     ulong ts = millis();
-    Serial.printf("[%lu]Debounce: %d:%d\n", ts, button->btnClick, button->btnStatus);
     bool btn = button->DigitalRead(button->pin);
-    //   Serial.printf("btn: %d\n", btn);
     if (btn == button->btnStatus)
     { // action confirmed
         if (button->btnClick)
@@ -113,16 +111,12 @@ SigmaButtonEvent SigmaButton::releaseEvent()
         return SIGMA_BUTTON_EVENT_LONG_LONG_RELEASED;
     if (btnState == SIGMA_BUTTON_EVENT_DOUBLE_CLICK)
         return SIGMA_BUTTON_EVENT_DOUBLE_RELEASED;
-    //    Serial.printf("STATE=%d\n", btnState);
     return SIGMA_BUTTON_EVENT_ERROR;
 }
 
 void SigmaButton::cycleFunc(TimerHandle_t xTimer)
 {
     SigmaButton *button = (SigmaButton *)pvTimerGetTimerID(xTimer);
-    //    ulong ts = millis();
-    //    Serial.printf("[%lu]Cycle: %d\n", ts, button->btnState);
-    // bool btn = digitalRead(button->pin);
     switch (button->btnState)
     {
     case SIGMA_BUTTON_EVENT_CLICK:
